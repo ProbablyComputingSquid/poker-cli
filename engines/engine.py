@@ -1,4 +1,8 @@
 import sys
+from pokerkit import *
+from phevaluator.evaluator import evaluate_cards
+import json
+
 
 if len(sys.argv) < 3:
     raise Exception("Unexpected invocation")
@@ -20,13 +24,47 @@ game_actions_file = sys.argv[6]
 temp_dir_path = sys.argv[7]
 
 game_params_data = open(game_params_file, "r").read().close()
+game_params_data = json.loads(game_params_data)
+"""
+{
+    "engines": [<engine names>],
+    "small_blind": <integer>,
+    "big_blind": <integer>,
+    "ante": <integer>,
+    "starting_funds": <integer>,
+    "starting_time_bank": <integer>
+}"""
 game_state_data = open(game_state_file, "r").read().close()
-game_actions_data = open(game_actions_file, "r").read().close()
+game_state_data = json.loads(game_state_data)
+"""{
+    "you_index": <number>,
+    "funds": [<unbet funds>],
+    "bets": [<current bets>],
+    "folds": [<current fold states>],
+    "time_banks": [<time banks>],
+    "your_hand": [<two cards>],
+    "revealed_cards": [<revealed cards>],
+    "small_blind": <small blind index>,
+    "big_blind": <big blind index>
+}"""
+
+#game_actions_data = open(game_actions_file, "r").read().close()
 
 
 ## sooo... most important stuff is in game_state_data. 
 
-print("FOLD", flush=True)
+def call():
+    print("CALL", flush=True)
+def raise_amount(amount):
+    print(f"RAISE {amount}", flush=True)
+def fold():
+    print("FOLD", flush=True)
+
+def evaluate_hand():
+    hand = game_state_data["your_hand"] + game_state_data["revealed_cards"]
+    return evaluate_cards(hand)
+
+print(evaluate_hand())
 
 # cleanup, logging
-print("long-term logging", file=sys.stderr)
+#print("long-term logging", file=sys.stderr)
